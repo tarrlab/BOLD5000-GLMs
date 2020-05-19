@@ -18,20 +18,27 @@ addpath(genpath('fracridge'))
 subj = 'CSI2';
 
 % define
-sessionstorun = [5];
+sessionstorun = [7];
 stimdur = 1;
 tr = 2;
 
 nses = 15;
 runimgs = 37;
 
-method = 'kendrick_pipeline_v1';
+method = 'kendrick_pipeline_v2';
 
 dataset = 'BOLD5000';
 basedir = fullfile('/media','tarrlab','scenedata2');
 eventdir = fullfile(basedir,'5000_BIDS',['sub-' subj]);
 datadir = fullfile(basedir,'5000_BIDS','derivatives','fmriprep',['sub-' subj]);
-savedir = fullfile(homedir);
+savedir = fullfile(homedir,'betas',method);
+
+opt = struct();
+opt.wantlibrary=0;
+opt.wantfileoutputs = [0 1 0 0];
+opt.wantglmdenoise=0;
+opt.wantlss=0;
+opt.wantfracridge=0;
 
 %%
 
@@ -44,24 +51,6 @@ for ses = sessionstorun
     else
         sesstr = num2str(ses);
     end
-    
-    resultsdir = fullfile(savedir,'results',['sub-' subj],method,['ses-' sesstr]);
-    figuresdir = fullfile(savedir,'figures',['sub-' subj],method,['ses-' sesstr]);
-    betasdir = fullfile(savedir,'betas',['sub-' subj],method,['ses-' sesstr]);
-    
-    % handle directories
-    rmdirquiet(figuresdir);
-    rmdirquiet(resultsdir);
-    rmdirquiet(betasdir);
-    
-    mkdir(figuresdir)
-    addpath(figuresdir)
-    
-    mkdir(resultsdir)
-    addpath(resultsdir)
-    
-    mkdir(betasdir)
-    addpath(betasdir)
     
     disp(['loading session ' sesstr])
     
@@ -109,14 +98,11 @@ for ses = sessionstorun
     design = allses_design{ses};
     
     assert(length(data)==length(design));
-    opt = struct();
-    opt.chunknum = size(img,1) * size(img,2) * size(img,3) / 2;
-    opt.xvalscheme = {[1:2:length(design)] [2:2:length(design)]};
-   
-    %opt.wantlibrary=0;
-    %opt.hrflibrary = [];
     
-    results = GLMestimatesingletrial(design,data,stimdur,tr,[],opt);
+    opt.chunknum = size(img,1) * size(img,2) * size(img,3);
+    opt.xvalscheme = {[1:2:length(design)] [2:2:length(design)]};
+       
+    results = GLMestimatesingletrial(design,data,stimdur,tr,savedir,opt);
     
 end
 
