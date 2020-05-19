@@ -1,6 +1,5 @@
 
-
-%%
+%% 
 
 close all; clearvars -except allses_design subj sessionstorun; clc;
 
@@ -73,38 +72,6 @@ for ses = sessionstorun
     datafiles = datafiles(~datafiles.isdir,:).name;
     datafiles = datafiles(contains(datafiles,'_preproc.nii.gz') & ~contains(datafiles,'localizer'));
     
-%     eventfiles = struct2table(dir(subeventdir));
-%     eventfiles = eventfiles(~eventfiles.isdir,:).name;
-%     eventfiles = eventfiles(contains(eventfiles,'events.tsv') & ~contains(eventfiles,'localizer'));
-%     
-%     events = cell(1,length(datafiles));
-%     design = cell(1,length(datafiles));
-%     
-%     nconditions = runimgs * length(design);
-%     
-%     for i = 1:length(datafiles)
-%         
-%         % load event info, compute onset TRs
-%         rundur = 194; %size(events{i},4);
-%         events{i} = tdfread(fullfile(subeventdir,eventfiles{i}));
-%         onsetTRs = round(events{i}.onset./tr)+1;
-%         
-%         % for now, treat each image as its own condition
-%         conds = events{i}.Trial + (runimgs * (absolute_run-1));
-%         
-%         % sanity
-%         assert(length(onsetTRs) == length(conds))
-%         
-%         % populate design matrix for that run
-%         design{i} = sparse(rundur, nconditions);
-%         
-%         for j = 1:runimgs
-%             design{i}(onsetTRs(j), conds(j)) = 1; % important, for single trial every entry gets its cond
-%         end
-%        
-%         
-%     end
-%     
     % figure out runs
     files0 = matchfiles(fullfile(subdatadir,'*run*_preproc.nii'));
     maskfiles0 = matchfiles(fullfile(subdatadir,'*_brainmask.nii'));
