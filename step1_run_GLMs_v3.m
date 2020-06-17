@@ -1,9 +1,25 @@
-
 %%
 
 close all; clear; clc;
 
+opt = struct();
+opt.wantlibrary=1;
+opt.wantfileoutputs = [1 1 0 0];
+opt.wantglmdenoise=0;
+opt.wantlss=0;
+opt.wantfracridge=0;
+opt.wantmemoryoutputs=[0 0 0 0];
+
+opt.subj = 'CSI3';
+opt.method = 'test2';
+opt.sessionstorun = {[1,10,15]};
+opt.k = 2;
+
+results = run_GLMs(opt);
+
 %%
+
+function [results] = run_GLMs(opt)
 
 homedir = '/media/tarrlab/scenedata2/BOLD5000_GLMs/git/';
 cd(homedir)
@@ -15,17 +31,16 @@ addpath(genpath('fracridge'))
 
 %% hyperparameters
 
-subj = 'CSI3';
+subj = opt.subj;
 
 % define
-sessionstorun = [1:15];
 stimdur = 1;
 tr = 2;
 
 nses = 15;
 runimgs = 37;
 
-method = 'kendrick_pipeline_v7';
+method = opt.method;
 
 dataset = 'BOLD5000';
 basedir = fullfile('/media','tarrlab','scenedata2');
@@ -33,16 +48,24 @@ eventdir = fullfile(basedir,'5000_BIDS',['sub-' subj]);
 datadir = fullfile(basedir,'5000_BIDS','derivatives','fmriprep',['sub-' subj]);
 savedir = fullfile(homedir);
 
+% define
+sessionstorun = opt.sessionstorun; %{[2,4,10]};%,[3,5,15],[8,11,12],[1,7,13],[6,9,14]};
+k = opt.k;
+%sessionstorun = {[6,7,9,10,12]};%,[1,3,5,11,14],[2,4,8,13,15]};
+%sessionstorun = overall_winners{1,3}; %[1:15]; num2cell(1:15);%
+
+normalize = 0;
+
+
 %%
 
 allses_events = [];
-
 
 ses_event_table = [];
 
 ses_nruns = [];
 
-for ses = sessionstorun
+for ses = 1:15
     
     
     absolute_run = 1;
@@ -137,7 +160,7 @@ end
 
 allses_design = [];
 
-for ses = sessionstorun
+for ses = 1:15
     
     output_design = [];
     
@@ -170,88 +193,111 @@ for ses = sessionstorun
     
 end
 
-%%
-
-ses_repeats = zeros(length(allses_design),1);
-
-for ses = sessionstorun
-    
-    rep_counts = zeros(size(allses_design{ses}{1}));
-    
-    for run = 1:length(allses_design{ses})
-        
-        rep_counts = rep_counts + allses_design{ses}{run};
-        
-      
-    end
-    
-    assert(sum(rep_counts(:)) == 333 || sum(rep_counts(:)) == 370)
-    
-    ses_repeats(ses) = sum(sum(rep_counts,1) > 1);
-
-    
-end
-
-disp(['cumulative number of within-session-block repetitions ' num2str(sum(ses_repeats))])
 
 %%
 
-nreps = 100;
-
-scheme_lengths = [3 5];
-
-overall_winners = [];
-
-for sl = scheme_lengths
+for c = 1:length(sessionstorun)
     
-    summary = [];
+    data_scheme = [];
+    design_scheme = [];
     
-    for rep = 1:nreps
+    sessions = sessionstorun{c};
+    
+    savedir = fullfile(homedir,'betas',method, subj,['sessions_' strrep(strrep(strrep(num2str(sessions),' ','_'),'__','_'),'__','_')]);
+    
+    for ses = sessions
         
-        order = randperm(15);
+        %absolute_run = 1;
         
-        scheme = [];
-        for q = 1:15/sl
-            low = sl * (q-1) + 1;
-            high = sl * (q-1) + sl;
-            
-            scheme = [scheme {sort(order(low:high))}];
-        end
-                
-        ses_repeats = zeros(length(scheme),1);
-        
-        for s = 1:length(scheme)
-            
-            scheme_design = [];
-            for d = 1:length(scheme{1})
-                scheme_design = [scheme_design allses_design{scheme{s}(d)}];
-            end
-            %scheme_design = [ allses_design{scheme{s}(2)} allses_design{scheme{s}(3)}];
-            
-            rep_counts = zeros(size(scheme_design{1}));
-            
-            for run = 1:length(scheme_design)
-                
-                rep_counts = rep_counts + scheme_design{run};
-                
-            end
-            
-            ses_repeats(s) = sum(sum(rep_counts,1) > 1);
-            
+        if ses < 10
+            sesstr = ['0' num2str(ses)];
+        else
+            sesstr = num2str(ses);
         end
         
-        summary = [summary; {scheme sum(ses_repeats)}];
+        disp(['loading session ' sesstr])
+        
+        subdatadir = fullfile(datadir,['ses-' sesstr],'func');
+        subeventdir = fullfile(eventdir,['ses-' sesstr],'func');
+        
+        datafiles = struct2table(dir(subdatadir));
+        datafiles = datafiles(~datafiles.isdir,:).name;
+        datafiles = datafiles(contains(datafiles,'_preproc.nii.gz') & ~contains(datafiles,'localizer'));
+        
+        % figure out runs
+        files0 = matchfiles(fullfile(subdatadir,'*run*_preproc.nii'));
+        maskfiles0 = matchfiles(fullfile(subdatadir,'*_brainmask.nii'));
+        
+        if size(files0,1) == 0 || size(maskfiles0,1) == 0
+            files0 = matchfiles(fullfile(subdatadir,'*run*_preproc.nii.gz'));
+            maskfiles0 = matchfiles(fullfile(subdatadir,'*_brainmask.nii.gz'));
+            for p=1:length(files0)
+                gunzip(files0{p});
+                gunzip(maskfiles0{p});
+            end
+        end
+        
+        files0 = matchfiles(fullfile(subdatadir,'*run*_preproc.nii'));
+        maskfiles0 = matchfiles(fullfile(subdatadir,'*_brainmask.nii'));
+        
+        % load data
+        data = {};
+        for p=1:length(files0)
+            a1 = load_nii(files0{p});
+            img = single(a1.img);
+            
+            % load brain mask
+            mask = load_nii(maskfiles0{p});
+            for i=1:size(img,4)
+                thisimg = squeeze(img(:,:,:,i));
+                thisimg(mask.img==0) = 0;
+                img(:,:,:,i) = thisimg;
+            end
+            data{p} = img;
+        end
+        clear a1;
+        
+        % check sanity
+        design = allses_design{ses};
+        
+        assert(length(data)==length(design));
+        
+        data_scheme = [data_scheme data];
+        design_scheme = [design_scheme design];
         
     end
     
-    [maxreps,winner] = max(cell2mat(summary(:,2)));
     
-    winning_scheme = summary{winner,1};
     
-    for i = 1:length(winning_scheme)
-        disp(winning_scheme{i})
+    if normalize == 1
+        ses_means = [];
+        ses_stds = [];
+        for i = 1:length(data_scheme)
+            ses_means = [ses_means; nanmean(data_scheme{i}(:))];
+            ses_stds = [ses_stds; nanstd(data_scheme{i}(:))];
+        end
+        
+        allses_mean = nanmean(ses_means);
+        allses_std = nanmean(ses_stds);
+        
+        for i = 1:length(data_scheme)
+            curr_mean = nanmean(data_scheme{i}(:));
+            curr_std = nanstd(data_scheme{i}(:));
+            data_scheme{i} = (data_scheme{i}-curr_mean) .* (allses_std/curr_std) + allses_mean;
+        end
+    end
+    opt.chunknum = ceil(size(img,1) * size(img,2) * size(img,3) / (length(sessions)));
+    
+    opt.xvalscheme = [];
+    
+    for x = 1:k
+        opt.xvalscheme = [opt.xvalscheme {[x:k:length(design_scheme)]}];
     end
     
-    overall_winners = [overall_winners; {sl maxreps winning_scheme}];
+    results = GLMestimatesingletrial(design_scheme,data_scheme,stimdur,tr,savedir,opt);
     
 end
+
+end
+
+%%

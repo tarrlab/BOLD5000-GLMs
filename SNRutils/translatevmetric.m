@@ -8,7 +8,9 @@ function f = translatevmetric(x)
 % to SNR units. We carefully handle corner cases (see code).
 
 % load simulation results
-b1 = load('~/nsd/nsddata/templates/noiseceilingsimulations.mat');
+b1 = load('noiseceilingsimulations.mat');
+
+%b1.vmetricFINAL = rescale(b1.vmetricFINAL, prctile(x(:),5), prctile(x(:),95));
 
 % handle corner cases
 isbad = ~isfinite(x);

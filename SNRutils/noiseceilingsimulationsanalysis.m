@@ -1,14 +1,15 @@
 % define
-sessnums = [40]  % 32 30];
+sessnums = [15];  % 32 30];
 signalmn = 100;
 signalsd = 1;
 noisesds = 10.^([-2:.2:-1 -.9:0.1:.9 1:.2:2 5]);
 nrep = 100;
+nimg = 350;
 
 %%
 
 % load
-a1 = load('~/nsddata/experiments/nsd/nsd_expdesign.mat');
+%a1 = load('/media/tarrlab/scenedata2/BOLD5000_GLMs/git/nsd_expdesign.mat');
 
 % init
 vmetric = [];
@@ -17,14 +18,14 @@ vmetric = [];
 for pp=1:length(sessnums), pp
 
   % basic experimental design stuff
-  ord = a1.masterordering(1:750*sessnums(pp));
+  ord = labels(1:nimg*sessnums(1)); %a1.masterordering(1:142*sessnums(pp));
   ordU = unique(ord);
 
   % repeat for each noise level
   for qq=1:length(noisesds), qq
   
     % generate noiseless signal for up to 10,000 images
-    signal = signalmn + signalsd*randn(nrep,10000);
+    signal = signalmn + signalsd*randn(nrep,length(ordU));
     
     % generate simulated data (trial-wise responses)
     truesignal = zeros(nrep,length(ord));
@@ -35,10 +36,10 @@ for pp=1:length(sessnums), pp
     data = truesignal + truenoise;
 
     % perform data preparation on the simulated data
-    data0 = reshape(data,nrep,750,[]);
-    mn0 = mean(data0,2);
+    data0 = reshape(data,nrep,nimg,[]);
+    mn0 = mean(data0,2); % data is reps x imgs x sessions, take mean over imgs
     sd0 = std(data0,[],2);
-    data0 = reshape((data0 - repmat(mn0,[1 750 1])) ./ repmat(sd0,[1 750 1]),nrep,[]);
+    data0 = reshape((data0 - repmat(mn0,[1 nimg 1])) ./ repmat(sd0,[1 nimg 1]),nrep,[]);
     % no need to add the constant back in since it won't change the answer for vmetric
     
     % compute the v metric for the prepared simulated data
@@ -66,8 +67,8 @@ vmetricFINAL = mean(vmetric,3);
 vmetricFINAL = vmetricFINAL(ix);
 snrFINAL = snr(ix);
 
-s% save
-save('~/Dropbox/KKTEMP/noiseceilingsimulations.mat','vmetricFINAL','snrFINAL');
+%s% save
+save('/media/tarrlab/scenedata2/BOLD5000_GLMs/git/noiseceilingsimulations.mat','vmetricFINAL','snrFINAL');
 
 % put into ~/nsd/ppdata/
 

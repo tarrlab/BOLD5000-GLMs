@@ -18,14 +18,14 @@ addpath(genpath('fracridge'))
 subj = 'CSI2';
 
 % define
-sessionstorun = [7];
+sessionstorun = [1:15];
 stimdur = 1;
 tr = 2;
 
 nses = 15;
 runimgs = 37;
 
-method = 'kendrick_pipeline_v2';
+method = 'kendrick_pipeline_v4';
 
 dataset = 'BOLD5000';
 basedir = fullfile('/media','tarrlab','scenedata2');
@@ -34,23 +34,25 @@ datadir = fullfile(basedir,'5000_BIDS','derivatives','fmriprep',['sub-' subj]);
 savedir = fullfile(homedir,'betas',method);
 
 opt = struct();
-opt.wantlibrary=0;
-opt.wantfileoutputs = [0 1 0 0];
-opt.wantglmdenoise=0;
+opt.wantlibrary=1;
+opt.wantfileoutputs = [1 1 1 1];
+opt.wantglmdenoise=1;
 opt.wantlss=0;
-opt.wantfracridge=0;
+opt.wantfracridge=1;
 
 %%
 
 for ses = sessionstorun
     
-    absolute_run = 1;
+    %absolute_run = 1;
     
     if ses < 10
         sesstr = ['0' num2str(ses)];
     else
         sesstr = num2str(ses);
     end
+    
+    savedir = fullfile(savedir, subj, sesstr);
     
     disp(['loading session ' sesstr])
     
