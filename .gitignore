@@ -1,3 +1,10 @@
 betas
 *.mat
 *.m~
+results
+z-Old
+bold
+.ipynb_checkpoints
+logfiles
+*/.ipynb_checkpoints
+
