@@ -53,6 +53,7 @@ assert(isdir(savedir))
 
 disp('adding utility folders to path...')
 tic;
+%addpath(genpath
 addpath('GLMdenoise')
 addpath('GLMdenoise/utilities')
 addpath('fracridge/matlab')
