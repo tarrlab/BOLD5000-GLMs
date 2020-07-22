@@ -1,49 +1,25 @@
+function [design] = load_BOLD5000_design(eventdir, sessionstorun)
 
-%%
-
-close all; clear; clc;
-
-%%
-
-homedir = '/media/tarrlab/scenedata2/BOLD5000_GLMs/git/';
-cd(homedir)
-
-addpath(genpath('GLMdenoise'))
-addpath(genpath('vistasoft'))
-addpath(genpath('knkutils'))
-addpath(genpath('fracridge'))
-
-%% hyperparameters
-
-subj = 'CSI3';
-
-% define
-sessionstorun = [1:15];
-stimdur = 1;
-tr = 2;
+tic 
 
 nses = 15;
 runimgs = 37;
+runtrs = 194;
 
-method = 'kendrick_pipeline_v7';
+stimdur = 1;
+tr = 2;
 
-dataset = 'BOLD5000';
-basedir = fullfile('/media','tarrlab','scenedata2');
-eventdir = fullfile(basedir,'5000_BIDS',['sub-' subj]);
-datadir = fullfile(basedir,'5000_BIDS','derivatives','fmriprep',['sub-' subj]);
-savedir = fullfile(homedir);
+%% Accumulate event info for all sessions
 
-%%
+disp('accumulating event info...')
 
 allses_events = [];
-
 
 ses_event_table = [];
 
 ses_nruns = [];
 
-for ses = sessionstorun
-    
+for ses = 1:nses
     
     absolute_run = 1;
     
@@ -71,7 +47,7 @@ for ses = sessionstorun
     for i = 1:length(eventfiles)
         
         % load event info, compute onset TRs
-        rundur = 194; %size(events{i},4);
+        rundur = runtrs; %size(events{i},4);
         events{i} = tdfread(fullfile(subeventdir,eventfiles{i}));
         events{i}.ImgType = cell(size(events{i}.ImgType,1),1);
         ses_event_table = [ses_event_table; struct2table(events{i})];
@@ -104,7 +80,7 @@ for ses = sessionstorun
 end
 
 
-%%
+%% get indices of repeated images
 
 reps = zeros(size(ses_event_table,1),1);
 idx = 1;
@@ -122,7 +98,7 @@ for i = 1:size(ses_event_table,1)
     else
         labels(i) = idx;
         reps(idx) = reps(idx) + 1;
-        idx = idx + 1;          
+        idx = idx + 1;
     end
     
     if i == 1
@@ -130,14 +106,15 @@ for i = 1:size(ses_event_table,1)
     else
         seen_imgs = [seen_imgs; curr];
     end
-   
+    
 end
 
-%%
+%% create design matrices where each image is its own condition (4916 total)
+% note: repeats do not get their own condition ID
 
 allses_design = [];
 
-for ses = sessionstorun
+for ses = 1:nses
     
     output_design = [];
     
@@ -150,7 +127,7 @@ for ses = sessionstorun
         conds = labels(runidx);
         
         % load event info, compute onset TRs
-        rundur = 194; %size(events{i},4);
+        rundur = runtrs;
         
         onsetTRs = round(ses_event_table(runidx,:).onset./tr)+1;
         
@@ -170,88 +147,18 @@ for ses = sessionstorun
     
 end
 
-%%
-
-ses_repeats = zeros(length(allses_design),1);
+design = [];
 
 for ses = sessionstorun
     
-    rep_counts = zeros(size(allses_design{ses}{1}));
-    
-    for run = 1:length(allses_design{ses})
-        
-        rep_counts = rep_counts + allses_design{ses}{run};
-        
-      
-    end
-    
-    assert(sum(rep_counts(:)) == 333 || sum(rep_counts(:)) == 370)
-    
-    ses_repeats(ses) = sum(sum(rep_counts,1) > 1);
+    ses_design = allses_design{ses};
+    design = [design ses_design];
 
-    
 end
 
-disp(['cumulative number of within-session-block repetitions ' num2str(sum(ses_repeats))])
+disp('done')
 
-%%
+toc
 
-nreps = 100;
-
-scheme_lengths = [3 5];
-
-overall_winners = [];
-
-for sl = scheme_lengths
-    
-    summary = [];
-    
-    for rep = 1:nreps
-        
-        order = randperm(15);
-        
-        scheme = [];
-        for q = 1:15/sl
-            low = sl * (q-1) + 1;
-            high = sl * (q-1) + sl;
-            
-            scheme = [scheme {sort(order(low:high))}];
-        end
-                
-        ses_repeats = zeros(length(scheme),1);
-        
-        for s = 1:length(scheme)
-            
-            scheme_design = [];
-            for d = 1:length(scheme{1})
-                scheme_design = [scheme_design allses_design{scheme{s}(d)}];
-            end
-            %scheme_design = [ allses_design{scheme{s}(2)} allses_design{scheme{s}(3)}];
-            
-            rep_counts = zeros(size(scheme_design{1}));
-            
-            for run = 1:length(scheme_design)
-                
-                rep_counts = rep_counts + scheme_design{run};
-                
-            end
-            
-            ses_repeats(s) = sum(sum(rep_counts,1) > 1);
-            
-        end
-        
-        summary = [summary; {scheme sum(ses_repeats)}];
-        
-    end
-    
-    [maxreps,winner] = max(cell2mat(summary(:,2)));
-    
-    winning_scheme = summary{winner,1};
-    
-    for i = 1:length(winning_scheme)
-        disp(winning_scheme{i})
-    end
-    
-    overall_winners = [overall_winners; {sl maxreps winning_scheme}];
-    
 end
+

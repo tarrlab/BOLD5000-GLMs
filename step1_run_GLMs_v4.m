@@ -2,11 +2,16 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
+dbstop if error
+
 disp(['running for subject: ' subj])
 disp(['running for session: ' sess])
 disp(['running for method: ' GLM_method])
 
-date = '07_08_20'
+homedir = pwd;
+basedir = fullfile('/media','tarrlab','scenedata2','5000_BIDS');
+
+date = '07_13_20_v2';
 
 opt = struct();
 
@@ -31,17 +36,14 @@ end
 opt.chunknum = 100000;
 
 opt.subj = subj;
-opt.sessionstorun = {[str2num(sess)]}; %[2,4,10]};%,[3,5,15],[8,11,12],[1,7,13],[6,9,14]};
+opt.sessionstorun = {[str2num(sess)]};
 opt.loocv = 1;
 opt.k = 2;
 
-homedir = '/home/jacobpri/git/BOLD5000-GLMs/';
 cd(homedir)
 
-dataset = 'BOLD5000';
-basedir = '/lab_data/tarrlab/common/datasets/BOLD5000/';
-eventdir = fullfile(basedir,'BIDS',['sub-' subj]);
-datadir = fullfile(basedir,'BIDS','derivatives','fmriprep',['sub-' subj]);
+eventdir = fullfile(basedir,['sub-' subj]);
+datadir = fullfile(basedir,'derivatives','fmriprep',['sub-' subj]);
 savedir = fullfile(homedir);
 
 assert(isdir(basedir))
@@ -51,6 +53,7 @@ assert(isdir(savedir))
 
 disp('adding utility folders to path...')
 tic;
+%addpath(genpath
 addpath('GLMdenoise')
 addpath('GLMdenoise/utilities')
 addpath('fracridge/matlab')
@@ -70,14 +73,11 @@ addpath('knkutils/external')
 addpath('knkutils/colormap')
 addpath('knkutils/indexing')
 addpath('vistasoft/external/NIfTI_Shen')
-%addpath(genpath('GLMdenoise'))
-%addpath(genpath('vistasoft'))
-%addpath(genpath('knkutils'))
-%addpath(genpath('fracridge'))
+
 disp('done')
 toc;
 
-%% hyperparameters
+%% more hyperparameters
 
 tic;
 
@@ -87,16 +87,14 @@ tr = 2;
 
 nses = 15;
 runimgs = 37;
-runtrs = 194
+runtrs = 194;
 
 method = opt.method;
 
 % define
 sessionstorun = opt.sessionstorun;
 
-normalize = 0; % whether to rescale values of each session to have same mean/sd (don't use)
-
-%%
+%% Accumulate event info for all sessions
 
 disp('accumulating event info...')
 
@@ -167,7 +165,7 @@ for ses = 1:nses
 end
 
 
-%%
+%% get indices of repeated images
 
 reps = zeros(size(ses_event_table,1),1);
 idx = 1;
@@ -196,8 +194,8 @@ for i = 1:size(ses_event_table,1)
     
 end
 
-%%
-
+%% create design matrices where each image is its own condition (4916 total)
+% note: repeats do not get their own condition ID
 
 allses_design = [];
 
@@ -214,7 +212,7 @@ for ses = 1:nses
         conds = labels(runidx);
         
         % load event info, compute onset TRs
-        rundur = runtrs; %size(events{i},4);
+        rundur = runtrs; 
         
         onsetTRs = round(ses_event_table(runidx,:).onset./tr)+1;
         
@@ -236,9 +234,7 @@ end
 
 disp('done')
 
-%%
-
-
+%% load data from all sessions
 
 for c = 1:length(sessionstorun)
     
@@ -254,8 +250,6 @@ for c = 1:length(sessionstorun)
     disp(['savedir: ' savedir])
     
     for ses = sessions
-        
-        %absolute_run = 1;
         
         if ses < 10
             sesstr = ['0' num2str(ses)];
@@ -292,7 +286,8 @@ for c = 1:length(sessionstorun)
                 disp(subdatadir)
                 error('no files found.')
             end
-                
+            
+            % unzip files and put .nii data into bold dir, if necessary
             for p=1:length(files0)
                 fn = files0{p};
                 fn = strsplit(fn,'/');
@@ -346,28 +341,9 @@ for c = 1:length(sessionstorun)
         design_scheme = [design_scheme design];
         
     end
-        
-    if normalize == 1
-        ses_means = [];
-        ses_stds = [];
-        for i = 1:length(data_scheme)
-            ses_means = [ses_means; nanmean(data_scheme{i}(:))];
-            ses_stds = [ses_stds; nanstd(data_scheme{i}(:))];
-        end
-        
-        allses_mean = nanmean(ses_means);
-        allses_std = nanmean(ses_stds);
-        
-        for i = 1:length(data_scheme)
-            curr_mean = nanmean(data_scheme{i}(:));
-            curr_std = nanstd(data_scheme{i}(:));
-            data_scheme{i} = (data_scheme{i}-curr_mean) .* (allses_std/curr_std) + allses_mean;
-        end
-    end
     
     disp(['running GLM for sessions ' num2str(sessions)])
 
-    %opt.chunknum = ceil(size(img,1) * size(img,2) * size(img,3) / (length(sessions)));
     disp('chunknum:')
     disp(opt.chunknum)
     
