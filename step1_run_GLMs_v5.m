@@ -95,7 +95,7 @@ addpath('nifti_tools')
 
 %% load design matrix
 
-design = load_BOLD5000_design(eventdir, opt.sessionstorun);
+[design, ~] = load_BOLD5000_design(eventdir, opt.sessionstorun);
 
 %% load data
 
