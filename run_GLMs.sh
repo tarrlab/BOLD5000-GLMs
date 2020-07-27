@@ -11,4 +11,4 @@
 
 module load matlab-9.5
 
-matlab -nodisplay -nosplash -r "step1_run_GLMs_v4 $1 $2 $3; exit"
+matlab -nodisplay -nosplash -r "step1_run_GLMs_v5 $1 $2 $3; exit"

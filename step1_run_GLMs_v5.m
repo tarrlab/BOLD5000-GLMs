@@ -15,7 +15,7 @@ tic
 %% hyperparameters 
 
 homedir = pwd;
-bidsdir = fullfile('/media','tarrlab','scenedata2','5000_BIDS');
+bidsdir = fullfile('/lab_data','tarrlab','common','datasets','BOLD5000','BIDS');
 
 opt = struct();
 
