@@ -1,7 +1,7 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '07_22_20';
+date = '07_27_20';
 debug_mode = 1;
 
 dbstop if error
@@ -43,6 +43,7 @@ opt.loocv = 1;
 opt.k = 2;
 
 opt.chunknum = 100000;
+opt.numpcstotry = 20;
 
 disp('chunknum:')
 disp(opt.chunknum)
