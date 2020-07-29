@@ -1,4 +1,4 @@
-function [design, allses_design] = load_BOLD5000_design(eventdir, sessionstorun)
+function [design, allses_design, labels] = load_BOLD5000_design(eventdir, sessionstorun)
 
 tic 
 
