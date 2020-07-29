@@ -1,10 +1,10 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '07_27_20';
-debug_mode = 1;
+date = '07_27_20_one-sess';
+debug_mode = 0;
 
-dbstop if error
+%dbstop if error
 
 disp(['running for subject: ' subj])
 disp(['running for session: ' sess])
@@ -42,7 +42,7 @@ opt.sessionstorun = cellfun(@str2num,(strsplit(sess,'_')));
 opt.loocv = 1;
 opt.k = 2;
 
-opt.chunknum = 100000;
+opt.chunknum = 250000;
 opt.numpcstotry = 20;
 
 disp('chunknum:')
@@ -92,7 +92,6 @@ addpath('GLMdenoise')
 addpath('GLMdenoise/utilities')
 addpath('fracridge/matlab')
 addpath('nifti_tools')
-
 
 %% load design matrix
 
