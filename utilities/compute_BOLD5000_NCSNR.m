@@ -16,7 +16,7 @@ homedir = pwd;
 cd(homedir)
 
 bidsdir = fullfile('/media','tarrlab','scenedata2','5000_BIDS');
-savedir = fullfile(betadir, 'metrics');
+savedir = fullfile(betadir, version, 'metrics');
 
 if ~isdir(savedir)
     mkdir(savedir)
@@ -49,7 +49,7 @@ end
 
 n = size(session_groups,1);
 
-%%
+%% get repeat indices
 
 % experimental design stuff
 ord = labels;
@@ -91,9 +91,12 @@ if ~isfile(fullfile(savedir,'rep_betas.mat'))
         end
         
         betas = single(X.modelmd);
+        %betas = calczscore(betas, 4, [], [], 0); % zscore here or later?
         
         assert(size(betas,4) == sum(nruns)*37)
         
+        % populate array of session betas from the (potentially grouped)
+        % saved files
         idx = [];
         c = 1;
         for j = 1:size(session_groups,2)
@@ -114,14 +117,14 @@ if ~isfile(fullfile(savedir,'rep_betas.mat'))
     
     
     
-    %%
+    %% populate array of repeated betas
     
     counter = 0;
     
     for ses = 1:15
         disp(ses)
         betas = session_betas{ses};
-        betas = calczscore(betas,4,[],[],0);  % invalid voxels become NaN
+        betas = calczscore(betas,4,[],[],0);  % zscore here or earlier??
         n = size(betas,4);
         
         for i = 1:n
@@ -155,24 +158,21 @@ if ~isfile(fullfile(savedir, 'vmetric.mat')) || overwrite == 1
     
     %% compute vmetric
     
-    % vmetric_ = nanmean(std(rep_betas,[],4),5);  % we ignore NaNs that seep in
+    % vmetric_ = nanmean(std(rep_betas,[],4),5);  % OLD METHOD
     vmetric = sqrt(nanmean(nanstd(rep_betas,[],4).^2,5));
     
     %% compute SNR
     
     snr = translatevmetric(vmetric);
-    snr(snr>10) = NaN;
-    % snr_ = translatevmetric(vmetric_);
-    % snr_(snr_>10) = NaN;
+    
+    %snr(snr>10) = NaN; include?
     
     %% convert to percentage of noise ceiling (NCSNR)
     
-    k = 4;
+    k = 4; % num repeats in BOLD5000
     ncsnr = (100 .* (snr.^2)) ./ (snr.^2 + 1/k);
-    ncsnr(ncsnr == 100) = NaN;
     
-    % ncsnr_ = (100 .* (snr_.^2)) ./ (snr_.^2 + 1/k);
-    % ncsnr_(ncsnr_ == 100) = NaN;
+    %ncsnr(ncsnr == 100) = NaN; necessary?
     
     %% compute split half reliability
     
@@ -184,8 +184,8 @@ if ~isfile(fullfile(savedir, 'vmetric.mat')) || overwrite == 1
             for k = 1:subdims(3)
                 a = squeeze(rep_betas(i,j,k,:,:));
                 if sum(isnan(a(:))) == 0
-                    b = corr(nanmean(a(1:2:end,:))', nanmean(a(2:2:end,:))');
-                    %b = 1 - pdist(a,'correlation');
+                    b = corr(nanmean(a(1:2:end,:))', nanmean(a(2:2:end,:))'); % average every other repeat, and corr
+                    %b = 1 - pdist(a,'correlation'); % corr all repeats to each other, and average
                     reliability(i,j,k) = b;
                 else
                     reliability(i,j,k) = nan;
