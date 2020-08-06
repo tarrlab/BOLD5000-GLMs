@@ -1,7 +1,7 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '07_27_20';
+date = '08_06_20';
 debug_mode = 1;
 
 dbstop if error
@@ -43,7 +43,7 @@ opt.loocv = 1;
 opt.k = 2;
 
 opt.chunknum = 100000;
-opt.numpcstotry = 20;
+opt.numpcstotry = 12;
 
 disp('chunknum:')
 disp(opt.chunknum)
@@ -105,7 +105,7 @@ data = load_BOLD5000_data(subj, datadir, opt.sessionstorun);
 if debug_mode == 1
     for i = 1:length(data)
         dims = size(data{i});
-        subslices = 36; %floor(dims(3)*29/60):floor(dims(3)*31/60);
+        subslices = 25; %floor(dims(3)*29/60):floor(dims(3)*31/60);
         data{i} = data{i}(:,:,subslices,:);
     end
 end
