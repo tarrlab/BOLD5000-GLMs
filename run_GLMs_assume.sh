@@ -1,12 +1,12 @@
 #!/bin/sh
 #SBATCH -N 1      # nodes requested
 #SBATCH -n 1      # tasks requested
-#SBATCH -c 1     # cores requested
-#SBATCH --partition=cpu
-#SBATCH --job-name GLM
-#SBATCH --mem=20G  # memory 
+#SBATCH -c 3     # cores requested
+#SBATCH --partition=gpu
+#SBATCH --job-name debug
+#SBATCH --mem=100G  # memory 
 #SBATCH --output logfiles/sbatch-logfile-%j.txt  # send stdout to outfile
-#SBATCH --time=00:10:00
+#SBATCH --time=02:00:00
 
 module load matlab-9.5
 

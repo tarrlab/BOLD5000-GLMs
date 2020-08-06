@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# sbatch run_GLMs_optimize.sh CSI2 1_4_7_10_13 optimize
+# sbatch run_GLMs_optimize.sh CSI2 2_5_8_11_14 optimize
+# sbatch run_GLMs_optimize.sh CSI2 3_6_9_12_15 optimize
+
+sbatch run_GLMs_assume.sh CSI2 1_4_7_10_13 assume
+sbatch run_GLMs_assume.sh CSI2 2_5_8_11_14 assume
+sbatch run_GLMs_assume.sh CSI2 3_6_9_12_15 assume
+
 ## sbatch run_GLMs_assume.sh CSI1 7_10_12 assume
 ## sbatch run_GLMs_assume.sh CSI1 1_2_3 assume
 ## sbatch run_GLMs_assume.sh CSI1 4_13_14 assume
@@ -105,20 +113,20 @@
 # sbatch run_GLMs_optimize.sh CSI2 14 optimize
 # sbatch run_GLMs_optimize.sh CSI2 15 optimize
 
-sbatch run_GLMs_optimize.sh CSI3 1 optimize
-sbatch run_GLMs_optimize.sh CSI3 2 optimize
-sbatch run_GLMs_optimize.sh CSI3 3 optimize
-sbatch run_GLMs_optimize.sh CSI3 4 optimize
-sbatch run_GLMs_optimize.sh CSI3 5 optimize
-sbatch run_GLMs_optimize.sh CSI3 6 optimize
-sbatch run_GLMs_optimize.sh CSI3 7 optimize
-sbatch run_GLMs_optimize.sh CSI3 8 optimize
-sbatch run_GLMs_optimize.sh CSI3 9 optimize
-sbatch run_GLMs_optimize.sh CSI3 10 optimize
-sbatch run_GLMs_optimize.sh CSI3 11 optimize
-sbatch run_GLMs_optimize.sh CSI3 12 optimize
-sbatch run_GLMs_optimize.sh CSI3 13 optimize
-sbatch run_GLMs_optimize.sh CSI3 14 optimize
-sbatch run_GLMs_optimize.sh CSI3 15 optimize
+# sbatch run_GLMs_optimize.sh CSI3 1 optimize
+# sbatch run_GLMs_optimize.sh CSI3 2 optimize
+# sbatch run_GLMs_optimize.sh CSI3 3 optimize
+# sbatch run_GLMs_optimize.sh CSI3 4 optimize
+# sbatch run_GLMs_optimize.sh CSI3 5 optimize
+# sbatch run_GLMs_optimize.sh CSI3 6 optimize
+# sbatch run_GLMs_optimize.sh CSI3 7 optimize
+# sbatch run_GLMs_optimize.sh CSI3 8 optimize
+# sbatch run_GLMs_optimize.sh CSI3 9 optimize
+# sbatch run_GLMs_optimize.sh CSI3 10 optimize
+# sbatch run_GLMs_optimize.sh CSI3 11 optimize
+# sbatch run_GLMs_optimize.sh CSI3 12 optimize
+# sbatch run_GLMs_optimize.sh CSI3 13 optimize
+# sbatch run_GLMs_optimize.sh CSI3 14 optimize
+# sbatch run_GLMs_optimize.sh CSI3 15 optimize
 
 #sbatch run_GLMs_optimize.sh CSI1 1 optimize
