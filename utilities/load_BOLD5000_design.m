@@ -1,7 +1,6 @@
 function [design, allses_design, cond_labels] = load_BOLD5000_design(eventdir, sessionstorun)
 
 nses = 15;
-maxruns = 10;
 runtrs = 194;
 
 tr = 2;
@@ -12,8 +11,8 @@ assert(isfolder(eventdir))
 
 disp('accumulating event info...')
 
-allses_events = cell(nses, maxruns);
-allses_design = cell(size(allses_events));
+allses_events = cell(1,nses);
+allses_design = cell(1,nses);
 
 stim_names = [];
 
@@ -35,7 +34,7 @@ for ses = 1:nses
             
     for run = 1:length(eventfiles)   
        temp = tdfread(fullfile(subeventdir,eventfiles{run}));    
-       allses_events{ses,run} = temp;
+       allses_events{ses}{run} = temp;
        stim_names = [stim_names; cellstr(temp.ImgName)];
     end
     
@@ -50,20 +49,15 @@ mapping = [stim_names num2cell(cond_labels)];
 
 for ses = 1:nses
     
-    for run = 1:maxruns
+    for run = 1:length(allses_events{ses})
         
-        events0 = allses_events{ses,run};
-        
-        if ~isstruct(events0)
-            continue
-        end
-        
+        events0 = allses_events{ses}{run};
         design0 = sparse(runtrs, length(unique_names));
 
         onsetTRs = round(events0.onset./tr)+1;
         
         % img names presented this run
-        runimgs = cellstr(allses_events{ses,run}.ImgName);
+        runimgs = cellstr(allses_events{ses}{run}.ImgName);
         
         % for each name 
         for img = 1:length(runimgs)
@@ -81,7 +75,7 @@ for ses = 1:nses
                 
         end
         
-        allses_design{ses,run} = design0;
+        allses_design{ses}{run} = design0;
         
     end
     
@@ -90,15 +84,13 @@ end
 %%
 
 for ses = 1:nses
-    for run = 1:maxruns
-        if ~isstruct(allses_events{ses,run})
-            continue
-        end
+    for run = 1:length(allses_events{ses})
+        
         % lookup img names using cond labels from design matrix 
-        [runconds, ~] = find(allses_design{ses,run}');
+        [runconds, ~] = find(allses_design{ses}{run}');
         
         namesA = unique_names(runconds);
-        namesB = cellstr(allses_events{ses,run}.ImgName);
+        namesB = cellstr(allses_events{ses}{run}.ImgName);
         
         assert(all(strcmp(namesA,namesB)))
    
@@ -111,8 +103,8 @@ design = [];
 
 for ses = sessionstorun
     
-    ses_design = allses_design(ses,:);
-    design = [design ses_design(~cellfun(@isempty,ses_design))];
+    ses_design = allses_design{ses};
+    design = [design ses_design];
 
 end
 
