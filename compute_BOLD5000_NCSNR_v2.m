@@ -1,9 +1,8 @@
-function [] = compute_BOLD5000_NCSNR(betadir, version)
+function [] = compute_BOLD5000_NCSNR_v2(betadir, version)
 
 tic
 
-overwrite = 1;
-%betadir = '/media/tarrlab/scenedata2/BOLD5000_GLMs/git/betas/07_27_20_one-sess_assume/CSI2';
+%betadir = '/media/tarrlab/scenedata2/BOLD5000_GLMs/git/betas/08_06_20_one-sess/CSI2';
 %betadir = '/media/tarrlab/scenedata2/BOLD5000_GLMs/git/z-Old/assume_hrf/CSI2';
 %version = 'TYPEB_FITHRF';
 
@@ -29,6 +28,7 @@ assert(ismember(subj, {'CSI1','CSI2','CSI3'}))
 eventdir = fullfile(bidsdir,['sub-' subj]);
 
 [~, allses_design, labels] = load_BOLD5000_design(eventdir, 1);
+
 
 %% get subdirectory names and session groupings
 
@@ -152,60 +152,50 @@ else
     
 end
 
-if ~isfile(fullfile(savedir, 'vmetric.mat')) || overwrite == 1
-    
-    disp('computing vmetric, snr, ncsnr, and split-half reliability')
-    
-    %% compute vmetric
-    
-    % vmetric_ = nanmean(std(rep_betas,[],4),5);  % OLD METHOD
-    vmetric = sqrt(nanmean(nanstd(rep_betas,[],4).^2,5));
-    
-    %% compute SNR
-    
-    snr = translatevmetric(vmetric);
-    
-    %snr(snr>10) = NaN; include?
-    
-    %% convert to percentage of noise ceiling (NCSNR)
-    
-    k = 4; % num repeats in BOLD5000
-    ncsnr = (100 .* (snr.^2)) ./ (snr.^2 + 1/k);
-    
-    %ncsnr(ncsnr == 100) = NaN; necessary?
-    
-    %% compute split half reliability
-    
-    reliability = zeros(subdims(1),subdims(2),subdims(3));
-    
-    for i = 1:subdims(1)
-        disp(i)
-        for j = 1:subdims(2)
-            for k = 1:subdims(3)
-                a = squeeze(rep_betas(i,j,k,:,:));
-                if sum(isnan(a(:))) == 0
-                    b = corr(nanmean(a(1:2:end,:))', nanmean(a(2:2:end,:))'); % average every other repeat, and corr
-                    %b = 1 - pdist(a,'correlation'); % corr all repeats to each other, and average
-                    reliability(i,j,k) = b;
-                else
-                    reliability(i,j,k) = nan;
-                end
+disp('computing vmetric, snr, ncsnr, and split-half reliability')
+
+%% compute vmetric
+
+%vmetric_ = nanmean(nanstd(rep_betas,[],4),5);  % OLD METHOD
+vmetric = sqrt(nanmean(nanstd(rep_betas,[],4).^2,5));
+
+%% compute SNR
+
+snr = translatevmetric(vmetric);
+
+%% convert to percentage of noise ceiling (NCSNR)
+
+k = 4; % num repeats in BOLD5000
+ncsnr = (100 .* (snr.^2)) ./ (snr.^2 + 1/k);
+
+%% compute split half reliability
+
+reliability = zeros(subdims(1),subdims(2),subdims(3));
+
+for i = 1:subdims(1)
+    disp(i)
+    for j = 1:subdims(2)
+        for k = 1:subdims(3)
+            a = squeeze(rep_betas(i,j,k,:,:));
+            if sum(isnan(a(:))) == 0
+                %b = corr(nanmean(a(1:2:end,:))', nanmean(a(2:2:end,:))'); % average every other repeat, and corr
+                b = 1 - pdist(a,'correlation'); % corr all repeats to each other, and average
+                reliability(i,j,k) = nanmean(b);
+            else
+                reliability(i,j,k) = nan;
             end
         end
     end
-    
-    %% save outputs
-    
-    disp('saving metric volumes')
-    save(fullfile(savedir,'vmetric.mat'), 'vmetric')
-    save(fullfile(savedir,'snr.mat'), 'snr')
-    save(fullfile(savedir,'ncsnr.mat'), 'ncsnr')
-    save(fullfile(savedir,'reliability.mat'), 'reliability')
-    
-else
-    disp('files already exist and overwrite is false. done')
 end
 
+%% save outputs
+
+disp('saving metric volumes')
+save(fullfile(savedir,'vmetric.mat'), 'vmetric')
+save(fullfile(savedir,'snr.mat'), 'snr')
+save(fullfile(savedir,'ncsnr.mat'), 'ncsnr')
+save(fullfile(savedir,'reliability.mat'), 'reliability')
+    
 toc
 
 end
