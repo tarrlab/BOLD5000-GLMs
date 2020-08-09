@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sbatch run_SNR.sh /home/jacobpri/git/BOLD5000-GLMs/betas/07_27_20_one-sess_assume/CSI1 TYPEB_FITHRF
+sbatch run_SNR.sh /home/jacobpri/git/BOLD5000-GLMs/betas/08_06_20_assume/CSI2 TYPEB_FITHRF
 sbatch run_SNR.sh /home/jacobpri/git/BOLD5000-GLMs/betas/07_27_20_one-sess_assume/CSI2 TYPEB_FITHRF
 sbatch run_SNR.sh /home/jacobpri/git/BOLD5000-GLMs/betas/07_27_20_one-sess_assume/CSI3 TYPEB_FITHRF
 

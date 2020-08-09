@@ -1,8 +1,8 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '08_06_20';
-debug_mode = 1;
+date = '08_07_20';
+debug_mode = 0;
 
 dbstop if error
 
@@ -15,7 +15,7 @@ tic
 %% hyperparameters 
 
 homedir = pwd;
-bidsdir = fullfile('/media','tarrlab','scenedata2','5000_BIDS');
+bidsdir = fullfile('/lab_data','tarrlab','common','datasets','BOLD5000','BIDS');
 
 opt = struct();
 
@@ -42,7 +42,7 @@ opt.sessionstorun = cellfun(@str2num,(strsplit(sess,'_')));
 opt.loocv = 1;
 opt.k = 2;
 
-opt.chunknum = 100000;
+opt.chunknum = 50000;
 opt.numpcstotry = 12;
 
 disp('chunknum:')
