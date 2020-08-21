@@ -1,7 +1,7 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '08_07_20';
+date = '08_14_20_five-sess';
 debug_mode = 0;
 
 dbstop if error
@@ -42,7 +42,7 @@ opt.sessionstorun = cellfun(@str2num,(strsplit(sess,'_')));
 opt.loocv = 1;
 opt.k = 2;
 
-opt.chunknum = 50000;
+opt.chunknum = 125000;
 opt.numpcstotry = 12;
 
 disp('chunknum:')
