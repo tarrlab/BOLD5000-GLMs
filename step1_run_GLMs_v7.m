@@ -15,7 +15,7 @@ tic
 %% hyperparameters 
 
 homedir = pwd;
-bidsdir = fullfile('/media','tarrlab','scenedata2','5000_BIDS');
+bidsdir = fullfile('/lab_data','tarrlab','common','datasets','BOLD5000','BIDS');
 
 opt = struct();
 
@@ -42,7 +42,7 @@ opt.sessionstorun = cellfun(@str2num,(strsplit(sess,'_')));
 opt.loocv = 1;
 opt.k = 2;
 
-opt.chunknum = 100000;
+opt.chunknum = 125000;
 opt.numpcstotry = 12;
 
 disp('chunknum:')
