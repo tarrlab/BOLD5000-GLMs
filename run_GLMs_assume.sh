@@ -4,9 +4,9 @@
 #SBATCH -c 1      # cores requested
 #SBATCH --partition=cpu
 #SBATCH --job-name aGLM
-#SBATCH --mem=80G  # memory 
+#SBATCH --mem=50G  # memory 
 #SBATCH --output logfiles/sbatch-logfile-%j.txt  # send stdout to outfile
-#SBATCH --time=12:00:00
+#SBATCH --time=6:00:00
 
 module load matlab-9.5
 

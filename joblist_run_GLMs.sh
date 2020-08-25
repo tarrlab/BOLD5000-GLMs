@@ -87,17 +87,17 @@ NSES=15
 #######################
 
 
-sbatch run_GLMs_optimize.sh CSI2 2_3_4_8_14 
-sbatch run_GLMs_optimize.sh CSI2 6_7_10_11_13 
-sbatch run_GLMs_optimize.sh CSI2 1_5_9_12_15 
+# sbatch run_GLMs_optimize.sh CSI2 2_3_4_8_14 
+# sbatch run_GLMs_optimize.sh CSI2 6_7_10_11_13 
+# sbatch run_GLMs_optimize.sh CSI2 1_5_9_12_15 
 
 # sbatch run_GLMs_assume.sh CSI1 2_4_8_13_14 
 # sbatch run_GLMs_assume.sh CSI1 1_5_10_11_15 
 # sbatch run_GLMs_assume.sh CSI1 3_6_7_9_12 
 
-sbatch run_GLMs_optimize.sh CSI1 2_4_8_13_14 
-sbatch run_GLMs_optimize.sh CSI1 1_5_10_11_15 
-sbatch run_GLMs_optimize.sh CSI1 3_6_7_9_12 
+# sbatch run_GLMs_optimize.sh CSI1 2_4_8_13_14 
+# sbatch run_GLMs_optimize.sh CSI1 1_5_10_11_15 
+# sbatch run_GLMs_optimize.sh CSI1 3_6_7_9_12 
 
 # sbatch run_GLMs_assume.sh CSI2 2_3_4_8_14 
 # sbatch run_GLMs_assume.sh CSI2 6_7_10_11_13 
@@ -107,7 +107,28 @@ sbatch run_GLMs_optimize.sh CSI1 3_6_7_9_12
 # sbatch run_GLMs_assume.sh CSI3 4_7_10_11_14 
 # sbatch run_GLMs_assume.sh CSI3 1_2_8_12_13 
 
-sbatch run_GLMs_optimize.sh CSI3 3_5_6_9_15 
-sbatch run_GLMs_optimize.sh CSI3 4_7_10_11_14 
-sbatch run_GLMs_optimize.sh CSI3 1_2_8_12_13 
+# sbatch run_GLMs_optimize.sh CSI3 3_5_6_9_15 
+# sbatch run_GLMs_optimize.sh CSI3 4_7_10_11_14 
+# sbatch run_GLMs_optimize.sh CSI3 1_2_8_12_13 
 
+##########################
+
+# 2 sessions at a time
+
+##########################
+
+sbatch run_GLMs_optimize.sh CSI2 7_13 
+sbatch run_GLMs_optimize.sh CSI2 6_8 
+sbatch run_GLMs_optimize.sh CSI2 9_12 
+sbatch run_GLMs_optimize.sh CSI2 4_10 
+sbatch run_GLMs_optimize.sh CSI2 2_5 
+sbatch run_GLMs_optimize.sh CSI2 1_3 
+sbatch run_GLMs_optimize.sh CSI2 11_14_15 
+
+sbatch run_GLMs_assume.sh CSI2 7_13 
+sbatch run_GLMs_assume.sh CSI2 6_8 
+sbatch run_GLMs_assume.sh CSI2 9_12 
+sbatch run_GLMs_assume.sh CSI2 4_10 
+sbatch run_GLMs_assume.sh CSI2 2_5 
+sbatch run_GLMs_assume.sh CSI2 1_3 
+sbatch run_GLMs_assume.sh CSI2 11_14_15 
