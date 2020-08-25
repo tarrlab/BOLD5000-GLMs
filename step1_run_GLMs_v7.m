@@ -1,8 +1,8 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '08_06_20';
-debug_mode = 0;
+date = '08_24_20';
+debug_mode = 1;
 
 dbstop if error
 
