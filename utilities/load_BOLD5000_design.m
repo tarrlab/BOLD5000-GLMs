@@ -1,4 +1,4 @@
-function [design, allses_design, cond_labels] = load_BOLD5000_design(eventdir, sessionstorun)
+function [design, allses_design, cond_labels, session_indicator] = load_BOLD5000_design(eventdir, sessionstorun)
 
 nses = 15;
 runtrs = 194;
@@ -78,7 +78,7 @@ for ses = 1:nses
         allses_design{ses}{run} = design0;
         
     end
-    
+        
 end
 
 %%
@@ -100,11 +100,14 @@ end
 %%
 
 design = [];
-
+session_indicator = [];
+ct = 1; 
 for ses = sessionstorun
     
     ses_design = allses_design{ses};
     design = [design ses_design];
+    session_indicator = [session_indicator ones(1,length(ses_design)).*ct];
+    ct = ct + 1;
 
 end
 
