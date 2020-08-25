@@ -1,4 +1,4 @@
-function [data] = load_BOLD5000_data(subj, datadir, sessionstorun)
+function [data, rescale_fig] = load_BOLD5000_data(subj, datadir, sessionstorun)
 
 tic 
 
@@ -113,7 +113,7 @@ end
 
 if length(sessionstorun) > 1
     disp('more than one session being processed: rescaling data...')
-    data = rescale_data(data, ses_meanvols, ses_IDs);
+    [data, rescale_fig] = rescale_data(data, ses_meanvols, ses_IDs);
 end
     
 disp('done loading data')
@@ -122,7 +122,7 @@ toc
 
 end
 
-function [rescaled_data] = rescale_data(data, ses_meanvols, ses_IDs)
+function [rescaled_data, rescale_fig] = rescale_data(data, ses_meanvols, ses_IDs)
 
 assert(length(data) == length(ses_IDs))
 n = length(ses_meanvols);
@@ -189,6 +189,9 @@ xlabel('session')
 ylabel('session')
 title(['LR slope relating voxel intensities' newline 'between sessions (with rescaling)'])
 
+rescale_fig = gcf;
+
+%close
 
 end
 

@@ -96,11 +96,15 @@ addpath('nifti_tools')
 
 %% load design matrix
 
-[design, ~] = load_BOLD5000_design(eventdir, opt.sessionstorun);
+[design, ~, ~, session_indicator] = load_BOLD5000_design(eventdir, opt.sessionstorun);
+
+if length(opt.sessionstorun) > 1
+    opt.sessionindicator = session_indicator;
+end
 
 %% load data
 
-data = load_BOLD5000_data(subj, datadir, opt.sessionstorun);
+[data, rescale_fig] = load_BOLD5000_data(subj, datadir, opt.sessionstorun);
 
 if debug_mode == 1
     for i = 1:length(data)
@@ -125,6 +129,9 @@ tic;
 results = GLMestimatesingletrial(design,data,stimdur,tr,savedir,opt);
 
 disp('done with call to GLMestimatesingletrial')
+
+saveas(rescale_fig, fullfile(savedir,'rescaleOutcome.png'), 'png')
+close
 
 toc;
 

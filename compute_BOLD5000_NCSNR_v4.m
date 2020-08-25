@@ -59,7 +59,7 @@ for v = 1:length(versions)
 
             %%
 
-            eventdir = fullfile(bidsdir,['sub-' subj]);
+            eventdir = fullfile(bidsdir,['sub-' subj]);            
 
             [~, allses_design, labels, ~] = load_BOLD5000_design(eventdir, 1);
 
