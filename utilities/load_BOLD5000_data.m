@@ -114,6 +114,8 @@ end
 if length(sessionstorun) > 1
     disp('more than one session being processed: rescaling data...')
     [data, rescale_fig] = rescale_data(data, ses_meanvols, ses_IDs);
+else
+    rescale_fig = [];
 end
     
 disp('done loading data')

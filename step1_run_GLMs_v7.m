@@ -1,8 +1,8 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '08_24_20';
-debug_mode = 1;
+date = '08_24_20_three-sess';
+debug_mode = 0;
 
 dbstop if error
 
@@ -93,7 +93,6 @@ addpath('GLMdenoise/utilities')
 addpath('fracridge/matlab')
 addpath('nifti_tools')
 
-
 %% load design matrix
 
 [design, ~, ~, session_indicator] = load_BOLD5000_design(eventdir, opt.sessionstorun);
@@ -130,8 +129,10 @@ results = GLMestimatesingletrial(design,data,stimdur,tr,savedir,opt);
 
 disp('done with call to GLMestimatesingletrial')
 
-saveas(rescale_fig, fullfile(savedir,'rescaleOutcome.png'), 'png')
-close
+if length(data) > 10
+    saveas(rescale_fig, fullfile(savedir,'rescaleOutcome.png'), 'png')
+    close
+end
 
 toc;
 

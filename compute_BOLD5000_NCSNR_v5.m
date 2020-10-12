@@ -13,7 +13,7 @@ subjs = {'CSI1','CSI2','CSI3'};
 nses = 15;
 numreps = 4;
 nrunimgs = 37;
-overwrite = 1;
+overwrite = 0;
 
 for g = 1:length(groupings)
 
@@ -39,7 +39,7 @@ for g = 1:length(groupings)
             betadir = fullfile(homedir,'betas',[date '_' grouping0], subj);
             assert(isfolder(betadir))
 
-            metric_savedir = fullfile(homedir,'betas',[date '_' grouping], 'metrics');
+            metric_savedir = fullfile(homedir,'betas',[date '_' grouping], 'metrics_v2');
             if ~isfolder(metric_savedir)
                 mkdir(metric_savedir)
             end
@@ -145,7 +145,7 @@ for g = 1:length(groupings)
 
                 save(repbeta_savefn,'rep_betas')
             else
-                %disp(['metrics already exist, skipping'])
+                disp(['rep beta file already exists, skipping'])
                 %continue
                 load(repbeta_savefn)
             end
@@ -153,7 +153,7 @@ for g = 1:length(groupings)
             subdims = [size(rep_betas,1) size(rep_betas,2) size(rep_betas,3)];
 
             % compute vmetric from repeated betas
-            vmetric = sqrt(nanmean(nanstd(rep_betas,[],4).^2,5));
+            vmetric = sqrt(mean(std(rep_betas,[],4).^2,5));
 
             % compute SNR from vmetric
             snr = translatevmetric(vmetric);
@@ -168,10 +168,10 @@ for g = 1:length(groupings)
                     for kk = 1:subdims(3)
                         aa = squeeze(rep_betas(ii,jj,kk,:,:));
                         if sum(isnan(aa(:))) == 0
-                            bb0 = corr(nanmean(aa([1 2],:))', nanmean(aa([3 4],:))'); 
-                            bb1 = corr(nanmean(aa([1 3],:))', nanmean(aa([2 4],:))'); 
-                            bb2 = corr(nanmean(aa([1 4],:))', nanmean(aa([2 3],:))'); 
-                            reliability(ii,jj,kk) = nanmean([bb0 bb1 bb2]);
+                            bb0 = corr(mean(aa([1 2],:))', mean(aa([3 4],:))'); 
+                            bb1 = corr(mean(aa([1 3],:))', mean(aa([2 4],:))'); 
+                            bb2 = corr(mean(aa([1 4],:))', mean(aa([2 3],:))'); 
+                            reliability(ii,jj,kk) = mean([bb0 bb1 bb2]);
                         else
                             reliability(ii,jj,kk) = NaN;
                         end
