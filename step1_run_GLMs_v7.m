@@ -1,8 +1,8 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '08_24_20_three-sess';
-debug_mode = 0;
+date = '01_08_21_three-sess';
+debug_mode = 1;
 
 dbstop if error
 
@@ -129,7 +129,7 @@ results = GLMestimatesingletrial(design,data,stimdur,tr,savedir,opt);
 
 disp('done with call to GLMestimatesingletrial')
 
-if length(data) > 10
+if length(data) > 8
     saveas(rescale_fig, fullfile(savedir,'rescaleOutcome.png'), 'png')
     close
 end

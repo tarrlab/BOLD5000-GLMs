@@ -1,6 +1,11 @@
 function [design, allses_design, cond_labels, session_indicator] = load_BOLD5000_design(eventdir, sessionstorun)
 
-nses = 15;
+if contains(eventdir,'CSI4')
+    nses = 9;
+else
+    nses = 15;
+end
+
 runtrs = 194;
 
 tr = 2;
