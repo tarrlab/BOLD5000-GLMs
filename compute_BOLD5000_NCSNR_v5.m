@@ -3,6 +3,7 @@ clc; clear all; close all;
 addpath('utilities')
 homedir = pwd;
 bidsdir = fullfile('/lab_data','tarrlab','common','datasets','BOLD5000','BIDS');
+labdatadir = fullfile('/lab_data','tarrlab','jacobpri','BOLD5000-GLMs')
 
 %%
 
@@ -10,7 +11,6 @@ date = '08_24_20';
 groupings = {'one-sess','three-sess','five-sess'};
 versions = {'TYPEA_ASSUMEHRF', 'TYPEB_FITHRF','TYPEC_FITHRF_GLMDENOISE','TYPED_FITHRF_GLMDENOISE_RR'};
 subjs = {'CSI1','CSI2','CSI3'};
-nses = 15;
 numreps = 4;
 nrunimgs = 37;
 overwrite = 0;
@@ -35,16 +35,22 @@ for g = 1:length(groupings)
 
             subj = subjs{s};
             disp([grouping ' ' subj ' ' version])
+            
+            if strcmp(subj,'CSI4')
+                nses = 9;
+            else
+                nses = 15;
+            end
 
-            betadir = fullfile(homedir,'betas',[date '_' grouping0], subj);
+            betadir = fullfile(labdatadir,'betas',[date '_' grouping0], subj);
             assert(isfolder(betadir))
 
-            metric_savedir = fullfile(homedir,'betas',[date '_' grouping], 'metrics_v2');
+            metric_savedir = fullfile(labdatadir,'betas',[date '_' grouping], 'metrics');
             if ~isfolder(metric_savedir)
                 mkdir(metric_savedir)
             end
 
-            repbeta_savedir = fullfile(homedir,'betas',[date '_' grouping],'rep_betas');
+            repbeta_savedir = fullfile(labdatadir,'betas',[date '_' grouping],'rep_betas');
             if ~isfolder(repbeta_savedir)
                 mkdir(repbeta_savedir)
             end
