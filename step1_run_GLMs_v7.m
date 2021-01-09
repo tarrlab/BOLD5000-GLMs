@@ -1,8 +1,8 @@
 
 function [] = run_GLMs(subj, sess, GLM_method)
 
-date = '01_08_21_three-sess';
-debug_mode = 1;
+date = '01_09_21_five-sess';
+debug_mode = 0;
 
 dbstop if error
 
@@ -15,6 +15,7 @@ tic
 %% hyperparameters 
 
 homedir = pwd;
+labdatadir = fullfile('/lab_data','tarrlab','jacobpri','BOLD5000-GLMs');
 bidsdir = fullfile('/lab_data','tarrlab','common','datasets','BOLD5000','BIDS');
 
 opt = struct();
@@ -75,7 +76,8 @@ cd(homedir)
 
 eventdir = fullfile(bidsdir,['sub-' subj]);
 datadir = fullfile(bidsdir,'derivatives','fmriprep',['sub-' subj]);
-savedir = fullfile(homedir,'betas',method, subj,['sessions_' strrep(strrep(strrep(num2str(opt.sessionstorun),' ','_'),'__','_'),'__','_')]);
+savedir = fullfile(labdatadir,'betas',method, subj,['sessions_' strrep(strrep(strrep(num2str(opt.sessionstorun),' ','_'),'__','_'),'__','_')]);
+%savedir = fullfile(homedir,'betas',method, subj,['sessions_' strrep(strrep(strrep(num2str(opt.sessionstorun),' ','_'),'__','_'),'__','_')]);
 
 if debug_mode == 1
     savedir = [savedir '_debug'];
@@ -129,7 +131,7 @@ results = GLMestimatesingletrial(design,data,stimdur,tr,savedir,opt);
 
 disp('done with call to GLMestimatesingletrial')
 
-if length(data) > 8
+if length(data) > 10
     saveas(rescale_fig, fullfile(savedir,'rescaleOutcome.png'), 'png')
     close
 end

@@ -37,7 +37,7 @@ for ses = sessionstorun
         
         disp('need to unzip data files...')
         
-        targetdir = fullfile('bold',['sub-' subj],['ses-' sesstr]);
+        targetdir = fullfile('/lab_data','tarrlab','jacobpri','BOLD5000-GLMs','bold',['sub-' subj],['ses-' sesstr]);
         
         if ~isdir(targetdir)
             mkdir(targetdir)

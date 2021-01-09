@@ -1,22 +1,28 @@
 #!/bin/sh
 
-NSES=15
+NSES=9
 
 #######################
 # 1 SESSION AT A TIME 
 #######################
 
-for ((i=1;i<=NSES;i++)); do
-    sbatch run_GLMs_assume.sh CSI2 $i
-done
+sbatch run_GLMs_assume.sh CSI4 1_3_5_7_9
+sbatch run_GLMs_assume.sh CSI4 2_4_6_8
 
-for ((i=1;i<=NSES;i++)); do
-    sbatch run_GLMs_assume.sh CSI1 $i
-done
+sbatch run_GLMs_optimize.sh CSI4 1_3_5_7_9
+sbatch run_GLMs_optimize.sh CSI4 2_4_6_8
 
-for ((i=1;i<=NSES;i++)); do
-    sbatch run_GLMs_assume.sh CSI3 $i
-done
+# for ((i=1;i<=NSES;i++)); do
+#     sbatch run_GLMs_assume.sh CSI2 $i
+# done
+
+# for ((i=1;i<=NSES;i++)); do
+#     sbatch run_GLMs_assume.sh CSI1 $i
+# done
+
+# for ((i=1;i<=NSES;i++)); do
+#     sbatch run_GLMs_assume.sh CSI3 $i
+# done
 
 #  for ((i=1;i<=NSES;i++)); do
 #      sbatch run_GLMs_optimize.sh CSI3 $i
